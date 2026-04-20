@@ -67,7 +67,7 @@ export default function Login() {
             type="submit" 
             className="w-full bg-[#462ff7] text-white py-5 mt-4 rounded-[1.2rem] font-bold text-xl hover:bg-[#000000] active:scale-[0.98] transition-all shadow-xl shadow-[#6A5FFF]/30"
           >
-            Sign In
+            Inicia tu Globo
           </button>
         </form>
 
