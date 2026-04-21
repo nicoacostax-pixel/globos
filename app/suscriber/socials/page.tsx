@@ -98,13 +98,13 @@ export default function SubscriberSocials() {
 
         <div className="pt-10 space-y-4">
           <button 
-            onClick={() => router.push('/suscriber/plan')}
-            className="group w-full py-5 rounded-full font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2 hover:bg-black hover:text-white bg-[#2ECC71]"
+            onClick={() => router.push('/suscriber/plans')}
+            className="group w-full py-5 rounded-full font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2  hover:text-white bg-[#2ECC71]"
             style={{ color: colors.forest, boxShadow: `0 10px 25px -5px ${colors.emeraldShadow}` }}
           >
             Siguiente <ArrowRight className="group-hover:translate-x-1.5 transition-transform" />
           </button>
-          <button onClick={() => router.push('/suscriber/plan')} className="w-full text-center text-gray-400 font-bold text-sm">
+          <button onClick={() => router.push('/suscriber/plans')} className="w-full text-center text-gray-400 font-bold text-sm">
             Saltar por ahora
           </button>
         </div>

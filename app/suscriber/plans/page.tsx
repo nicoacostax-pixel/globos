@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Check, ArrowRight, Tag } from 'lucide-react';
+import confetti from 'canvas-confetti'; // Asegúrate de instalarlo con: npm install canvas-confetti && npm install -D @types/canvas-confetti
 
 export default function SubscriberPlans() {
   const router = useRouter();
@@ -14,8 +15,24 @@ export default function SubscriberPlans() {
     emerald: "#2ECC71",
     emeraldShadow: "rgba(46, 204, 113, 0.12)",
     borderDarker: "#E2E8F0",
-    atDark: "#1A2E1A",
     placeholderOscuro: "#A1A1A1",
+  };
+
+  // Función para disparar confeti
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#2ECC71', '#1A2E1A', '#FFFFFF']
+    });
+  };
+
+  const handlePlanSelection = (plan: string) => {
+    setSelectedPlan(plan);
+    if (plan === 'yearly') {
+      triggerConfetti(); // Dispara la animación al elegir el plan anual
+    }
   };
 
   const planCardBase = "relative flex items-center p-6 cursor-pointer border-2 rounded-[1.5rem] transition-all duration-300";
@@ -30,25 +47,29 @@ export default function SubscriberPlans() {
         </div>
       </div>
 
-      <div className="text-center mb-10 max-w-sm mx-auto">
-        <h1 className="text-3xl font-extrabold tracking-tight leading-snug mb-4">
-          Elige tu plan, empieza a ganar hoy 💸
+      <div className="text-center mb-10 max-w-md mx-auto">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight leading-snug mb-6">
+          Elige tu plan, empieza a <br /> ganar hoy 💸
         </h1>
-        <div className="space-y-2 inline-block text-left">
-          <p className="flex items-center gap-2 text-sm font-medium">
-            <Check size={18} className="text-[#2ECC71]" /> Ahorra cientos eligiendo Globo
-          </p>
-          <p className="flex items-center gap-2 text-sm font-medium">
-            <Check size={18} className="text-[#2ECC71]" /> Tienda todo-en-uno, fácil de configurar
-          </p>
+        
+        {/* Subtítulos/Beneficios CENTRADOS */}
+        <div className="flex flex-col items-center space-y-2 w-full">
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
+            <Check size={18} className="text-[#2ECC71] shrink-0" /> 
+            <span>Ahorra cientos eligiendo Globo</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-gray-600">
+            <Check size={18} className="text-[#2ECC71] shrink-0" /> 
+            <span>Tienda todo-en-uno, fácil de configurar</span>
+          </div>
         </div>
       </div>
 
-      <div className="w-full max-w-md px-4 space-y-6">
+      <div className="w-full max-w-md px-4 space-y-4">
         
         {/* Plan Mensual */}
         <div 
-          onClick={() => setSelectedPlan('monthly')}
+          onClick={() => handlePlanSelection('monthly')}
           className={`${planCardBase} ${selectedPlan === 'monthly' ? 'border-[#2ECC71] bg-white ring-4 ring-[#2ECC71]/10' : 'border-[#E2E8F0] bg-white opacity-60'}`}
         >
           <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${selectedPlan === 'monthly' ? 'border-[#2ECC71]' : 'border-gray-300'}`}>
@@ -60,15 +81,15 @@ export default function SubscriberPlans() {
           </div>
         </div>
 
-        {/* Plan Anual */}
+        {/* Plan Anual con etiqueta de ahorro */}
         <div 
-          onClick={() => setSelectedPlan('yearly')}
+          onClick={() => handlePlanSelection('yearly')}
           className={`${planCardBase} ${selectedPlan === 'yearly' ? 'border-[#2ECC71] bg-white ring-4 ring-[#2ECC71]/10' : 'border-[#E2E8F0] bg-white opacity-60'}`}
         >
-          <div className="absolute -top-3 right-8 bg-[#2ECC71] text-[#1A2E1A] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
-            Ahorra 20%
+          <div className="absolute -top-3 right-8 bg-[#A8E6CF] text-[#1A2E1A] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+            AHORRA 20%
           </div>
-          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${selectedPlan === 'yearly' ? 'border-[#2ECC71]' : 'border-gray-300'}`}>
+          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-4 ${selectedPlan === 'yearly' ? 'border-[#2ECC71]' : 'border-gray-200'}`}>
             {selectedPlan === 'yearly' && <div className="w-3 h-3 rounded-full bg-[#2ECC71]" />}
           </div>
           <div className="flex-1">
@@ -79,37 +100,31 @@ export default function SubscriberPlans() {
           </div>
         </div>
 
-        {/* Campo de Cupón de Descuento [NUEVO] */}
+        {/* Cupón */}
         <div className="pt-2">
           <div 
-            className="flex items-center gap-3 w-full p-4 bg-white border rounded-full transition-all duration-300 focus-within:border-[#2ECC71] focus-within:ring-4 focus-within:ring-[#2ECC71]/10"
+            className="flex items-center gap-3 w-full p-4 bg-white border rounded-[1.2rem] transition-all duration-300 focus-within:border-[#2ECC71]"
             style={{ borderColor: colors.borderDarker }}
           >
-            <Tag size={20} className="text-[#1A2E1A] shrink-0" />
+            <Tag size={20} className="text-gray-300 shrink-0" />
             <input 
               type="text" 
               placeholder="Código de descuento" 
-              className="flex-1 bg-transparent outline-none font-medium text-sm"
-              style={{ '--tw-placeholder-opacity': 1, '--tw-placeholder-color': colors.placeholderOscuro } as any}
+              className="flex-1 bg-transparent outline-none font-bold text-sm"
               value={coupon}
               onChange={(e) => setCoupon(e.target.value.toUpperCase())}
             />
-            {coupon && (
-              <button className="text-xs font-bold text-[#2ECC71] pr-2 hover:underline">
-                APLICAR
-              </button>
-            )}
           </div>
         </div>
 
-        <p className="text-center font-bold text-sm pt-2">
+        <p className="text-center font-bold text-sm pt-4">
           Total a pagar hoy $0 🙌
         </p>
 
-        <div className="pt-6">
+        <div className="pt-4">
           <button 
-            onClick={() => router.push('/suscriber/checkout')}
-            className="group w-full py-5 rounded-full font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2 hover:bg-black hover:text-white bg-[#2ECC71]"
+            onClick={() => router.push('/suscriber/start')}
+            className="group w-full py-5 rounded-full font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2 bg-[#2ECC71]"
             style={{ 
               color: colors.forest,
               boxShadow: `0 10px 25px -5px ${colors.emeraldShadow}`
