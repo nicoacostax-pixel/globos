@@ -2,104 +2,120 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, ChevronDown} from 'lucide-react';
+// Importamos todos los iconos necesarios
+import { 
+  FaInstagram, FaTiktok, FaFacebook, FaYoutube, 
+  FaLink, FaPinterest, FaSpotify, FaApple, 
+  FaEtsy, FaDiscord, FaSnapchat, FaTwitch, FaVimeo 
+} from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import { ChevronDown, ArrowRight, Mail } from 'lucide-react';
 
-// Iconos personalizados con el estilo de la marca
-const InstagramIcon = () => (
-  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]">
-    <div className="w-3.5 h-3.5 border-2 border-white rounded-sm flex items-center justify-center">
-      <div className="w-1 h-1 bg-white rounded-full" />
-    </div>
-  </div>
-);
-
-const TikTokIcon = () => (
-  <div className="relative w-5 h-5 flex items-center justify-center">
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full text-[#1A2E1A]">
-      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.03 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.9-.32-1.9-.39-2.81-.12-1.07.32-2 1.07-2.42 2.1-.45.95-.44 2.1-.06 3.03.31.8.94 1.47 1.74 1.81.88.4 1.89.46 2.78.15.82-.24 1.54-.78 1.94-1.54.34-.63.48-1.34.48-2.05V.02z"/>
-    </svg>
-  </div>
-);
-
-export default function SocialConnect() {
+export default function SubscriberSocials() {
   const router = useRouter();
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(false); // Estado para el despliegue
+  
+  const [socials, setSocials] = useState({
+    instagram: '', tiktok: '', email: '', facebook: '', 
+    youtube: '', link: '', pinterest: '', x: '',
+    spotify: '', apple: '', etsy: '', discord: '',
+    snapchat: '', twitch: '', vimeo: ''
+  });
 
   const colors = {
     forest: "#1A2E1A",
     emerald: "#2ECC71",
-    emeraldShadow: "rgba(46, 204, 113, 0.12)"
+    emeraldShadow: "rgba(46, 204, 113, 0.12)",
+    borderDarker: "#E2E8F0", 
+    atDark: "#1A2E1A", 
+    placeholderOscuro: "#A1A1A1",
   };
 
-  const inputContainer = "flex items-center gap-3 w-full p-5 bg-white border border-[#E5E7EB] rounded-[1.5rem] shadow-sm focus-within:border-[#2ECC71] focus-within:ring-4 focus-within:ring-[#2ECC71]/10 transition-all";
+  const inputContainer = "flex items-center gap-3 w-full p-4 bg-white border rounded-full transition-all duration-300 focus-within:border-[#2ECC71] focus-within:ring-4 focus-within:ring-[#2ECC71]/10";
+  const iconTextSeparator = "w-px h-6 bg-gray-100";
+
+  // Función reutilizable para los inputs
+  const SocialInput = ({ icon: Icon, label, placeholder, name, type = "text", iconColor = "" }: any) => (
+    <div className={inputContainer} style={{ borderColor: colors.borderDarker }}>
+      <div className="flex items-center gap-2 shrink-0">
+        <Icon className={`w-5 h-5 ${iconColor}`} />
+        <span className="font-bold text-xs" style={{ color: colors.atDark }}>{label}</span>
+      </div>
+      <div className={iconTextSeparator}></div>
+      <input 
+        type={type}
+        placeholder={placeholder}
+        className="flex-1 bg-transparent outline-none font-medium text-sm"
+        style={{ '--tw-placeholder-opacity': 1, '--tw-placeholder-color': colors.placeholderOscuro } as any}
+        value={(socials as any)[name]}
+        onChange={(e) => setSocials({...socials, [name]: e.target.value})}
+      />
+    </div>
+  );
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#F9FBF9] font-sans text-[#1A2E1A]">
+    <div className="flex min-h-screen flex-col items-center justify-start p-6 pt-20 bg-[#F9FBF9] font-sans text-[#1A2E1A]">
       
-      {/* Barra de progreso en verde esmeralda */}
-      <div className="w-full max-w-md mb-12">
-        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-          <div className="h-full bg-[#2ECC71] transition-all duration-700 w-[66%]" />
+      {/* Barra de progreso al 50% */}
+      <div className="w-full max-w-md mb-12 px-4">
+        <div className="h-1.5 w-full bg-gray-200/50 rounded-full overflow-hidden">
+          <div className="h-full bg-[#2ECC71] w-1/2 transition-all duration-700 ease-out"></div>
         </div>
       </div>
 
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-extrabold tracking-tight leading-tight mb-2">
-          Conecta tus <span style={{ color: colors.emerald }}>redes sociales</span> <br /> 
-          a tu tienda 🚀
-        </h1>
-      </div>
+      <h1 className="text-3xl font-extrabold text-center mb-10">
+        Conecta tus redes sociales <br /> a tu tienda
+      </h1>
 
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md px-4 space-y-4">
         
-        {/* Instagram */}
-        <div className={inputContainer}>
-          <InstagramIcon />
-          <span className="text-gray-300 font-bold">@</span>
-          <input type="text" placeholder="Tu usuario" className="flex-1 outline-none font-medium placeholder:text-gray-300" />
-        </div>
+        {/* Redes Principales */}
+        <SocialInput icon={FaInstagram} label="@" placeholder="Tu usuario" name="instagram" />
+        <SocialInput icon={FaTiktok} label="@" placeholder="Tu usuario" name="tiktok" />
 
-        {/* TikTok */}
-        <div className={inputContainer}>
-          <TikTokIcon />
-          <span className="text-gray-300 font-bold">@</span>
-          <input type="text" placeholder="Tu usuario" className="flex-1 outline-none font-medium placeholder:text-gray-300" />
-        </div>
+        {/* Sección Desplegable */}
+        {showMore && (
+          <div className="space-y-4 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <SocialInput icon={Mail} label="Email" placeholder="email@gmail.com" name="email" iconColor="text-red-500" />
+            <SocialInput icon={FaFacebook} label="URL" placeholder="https://www.facebook.com/" name="facebook" iconColor="text-blue-600" />
+            <SocialInput icon={FaYoutube} label="URL" placeholder="https://youtube.com/" name="youtube" iconColor="text-red-600" />
+            <SocialInput icon={FaLink} label="URL" placeholder="https://link.com/" name="link" iconColor="text-gray-600" />
+            <SocialInput icon={FaPinterest} label="URL" placeholder="https://www.pinterest.com/" name="pinterest" iconColor="text-red-700" />
+            <SocialInput icon={FaXTwitter} label="@" placeholder="Your Username" name="x" />
+            <SocialInput icon={FaSpotify} label="URL" placeholder="https://open.spotify.com/" name="spotify" iconColor="text-green-500" />
+            <SocialInput icon={FaApple} label="URL" placeholder="https://podcasts.apple.com/" name="apple" iconColor="text-purple-600" />
+          </div>
+        )}
 
-        {/* LinkedIn */}
-
-
-        {/* Botón de expansión con estilo dinámico */}
+        {/* Botón Ver Más / Ver Menos */}
         <button 
           onClick={() => setShowMore(!showMore)}
-          className="w-full flex items-center justify-center gap-2 text-[#2ECC71] font-bold text-sm py-2 hover:opacity-80 transition-opacity"
+          className="w-full flex items-center justify-center gap-1.5 text-[#2ECC71] font-bold text-sm py-2 hover:opacity-80 transition-all"
         >
-          Ver más opciones <ChevronDown size={16} className={`${showMore ? 'rotate-180' : ''} transition-transform`} />
+          {showMore ? 'Ver menos' : 'Ver más'} 
+          <ChevronDown size={16} className={`transition-transform duration-300 ${showMore ? 'rotate-180' : ''}`} />
         </button>
 
-        {/* Botones de acción con el estilo de la página Register */}
-        <div className="pt-8 space-y-4">
+        <div className="pt-10 space-y-4">
           <button 
             onClick={() => router.push('/suscriber/plan')}
-            className="group w-full py-5 rounded-[1.2rem] font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 hover:bg-black hover:text-white hover:scale-[1.03]"
-            style={{ 
-              backgroundColor: colors.emerald, 
-              color: colors.forest,
-              boxShadow: `0 10px 25px -5px ${colors.emeraldShadow}`
-            }}
+            className="group w-full py-5 rounded-full font-bold text-xl transition-all duration-300 flex items-center justify-center gap-2 hover:bg-black hover:text-white bg-[#2ECC71]"
+            style={{ color: colors.forest, boxShadow: `0 10px 25px -5px ${colors.emeraldShadow}` }}
           >
-            Siguiente
-            <ArrowRight className="group-hover:translate-x-1.5 transition-transform" />
+            Siguiente <ArrowRight className="group-hover:translate-x-1.5 transition-transform" />
           </button>
-          
-          <button 
-            onClick={() => router.push('/suscriber/plan')}
-            className="w-full text-center text-gray-400 font-bold hover:text-[#2ECC71] transition-colors"
-          >
-            Omitir por ahora
+          <button onClick={() => router.push('/suscriber/plan')} className="w-full text-center text-gray-400 font-bold text-sm">
+            Saltar por ahora
           </button>
         </div>
       </div>
+
+      <svg width="0" height="0" className="absolute">
+        <linearGradient id="ig-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
+          <stop stopColor="#F58529" offset="0%" /><stop stopColor="#DD2A7B" offset="25%" />
+          <stop stopColor="#8134AF" offset="50%" /><stop stopColor="#515BD4" offset="100%" />
+        </linearGradient>
+      </svg>
     </div>
   );
 }
