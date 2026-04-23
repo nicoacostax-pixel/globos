@@ -1,126 +1,236 @@
 'use client'
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { LayoutDashboard, Store, Wallet, BarChart3, Users, Mail, Settings, ChevronRight, Check, Globe } from 'lucide-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { createBrowserClient } from '@supabase/ssr';
+import { 
+  Home, Store, Wallet, BarChart3, 
+  Users, Copy, ChevronRight, Palette, 
+  Package, Sparkles, Send, X,
+  Calendar, Mail, Heart,
+  Share2, MessageCircle, Settings,
+  LogOut
+} from 'lucide-react';
 
-export default function UserDashboard() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const username = "nico"; 
+// ESTO ES CLAVE: Definir el cliente FUERA para evitar el error de "Multiple instances"
+// que aparece en tu terminal.
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-  const colors = {
-    forest: "#1A2E1A",
-    emerald: "#2ECC71",
-    emeraldShadow: "rgba(46, 204, 113, 0.10)",
-    bgLight: "#F9FBF9",
-    borderGray: "#F1F5F9"
+export default function GlobosDashboard() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const profile = { username: 'gonzo' };
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isLoggingOut) return;
+
+    try {
+      setIsLoggingOut(true);
+      
+      // 1. Ejecutar el sign out en Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error al cerrar sesión en Supabase:', error.message);
+      }
+
+      // 2. Limpiar almacenamiento local por si acaso
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+        // Usamos replace para que no puedan volver atrás con el botón del navegador
+        window.location.replace('/login');
+      }
+      
+    } catch (error) {
+      console.error('Fallo crítico:', error);
+      window.location.replace('/login');
+    }
   };
 
-  const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Mi Tienda', icon: Store },
-    { name: 'Ingresos', icon: Wallet },
-    { name: 'Analíticas', icon: BarChart3 },
-    { name: 'Clientes', icon: Users },
-    { name: 'Email Marketing', icon: Mail },
-    { name: 'Ajustes', icon: Settings },
+  const menuItems = [
+    { name: 'Inicio', icon: Home, path: '/dashboard' },
+    { name: 'Mi Globo', icon: Store, path: '/globos' },
+    { name: 'Ingresos', icon: Wallet, path: '/ingresos' },
+    { name: 'Analíticas', icon: BarChart3, path: '/analiticas' },
   ];
 
-  const checklistSteps = [
-    { 
-      id: 1, 
-      title: 'Añade tu foto de perfil', 
-      desc: 'Personaliza tu tienda Globo subiendo tu mejor foto.', 
-      button: 'Subir Foto',
-      iconUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?&w=128&h=128&auto=format&fit=crop&q=80' 
-    },
-    { id: 2, title: 'Conecta tus redes sociales', desc: 'Sincroniza todas tus cuentas para mayor visibilidad.' },
-    { id: 3, title: 'Configura tu depósito directo', desc: 'Globo usa Stripe para pagar directamente a tu banco.' },
-    { id: 4, title: 'Crea tu primer producto', desc: 'Vende cualquier producto digital, servicio o asesoría.' },
+  const extraItems = [
+    { name: 'Clientes', icon: Users, path: '/clientes' },
+    { name: 'Comunidad', icon: Heart, path: '/comunidad' },
+    { name: 'Funnels', icon: Share2, path: '/funnels' },
+    { name: 'Citas', icon: Calendar, path: '/citas' },
+    { name: 'Referidos', icon: MessageCircle, path: '/referidos' },
+    { name: 'Email Marketing', icon: Mail, path: '/emails' },
+    { name: 'AutoDM', icon: Send, path: '/autodm' },
+  ];
+
+  const dashboardActions = [
+    { title: 'Choose store theme', desc: 'Customize your store design.', icon: Palette, bg: 'bg-orange-100/50', col: 'text-orange-500', path: '/edit-design' },
+    { title: 'Add a product', desc: 'Go from idea to offer in minutes.', icon: Package, bg: 'bg-[#DFF0DF]/50', col: 'text-[#1A2E1A]', path: '/globos' },
+    { title: 'Ask Globito', desc: 'Your very own AI Creator coach.', icon: Sparkles, bg: 'bg-red-50/50', col: 'text-red-500', path: '/dashboard' }
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#F9FBF9] font-sans text-[#1A2E1A]">
+    <div className="flex flex-col md:flex-row h-screen w-full bg-white text-[#1A2E1A] overflow-hidden font-sans">
       
-      {/* Barra Lateral (Sidebar) */}
-      <aside className="w-64 bg-white border-r p-6 flex flex-col justify-between" style={{ borderColor: colors.borderGray }}>
-        <div>
-          <h1 className="text-3xl font-black text-[#1A2E1A] mb-12 italic">Globo🎈</h1>
-          <nav className="space-y-3">
-            {navItems.map((item, index) => (
-              <Link key={item.name} href="#" className={`flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold transition-all ${index === 0 ? 'bg-[#2ECC71]' : 'text-gray-500 hover:bg-[#F9FBF9]'}`} style={{ color: index === 0 ? colors.forest : 'inherit' }}>
-                <item.icon size={20} className={index === 0 ? '' : 'text-gray-400'} />
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+      {/* Sidebar Desktop */}
+      <aside className="hidden md:flex w-72 h-full bg-[#F0F7F0] border-r border-black/5 flex-col p-6 shrink-0 z-50">
+        <div className="mb-8 flex items-center gap-2 px-2 cursor-pointer" onClick={() => router.push('/dashboard')}>
+          <span className="text-3xl drop-shadow-sm">🎈</span>
+          <span className="text-4xl font-light tracking-tight">globos</span>
         </div>
-        <div className="text-center pt-8 border-t" style={{ borderColor: colors.borderGray }}>
-          <div className="w-12 h-12 rounded-full bg-gray-200 mx-auto mb-3" />
-          <p className="font-bold text-sm">globo.me/{username}</p>
-          <button className="text-xs font-bold text-[#2ECC71] mt-1">Mi Cuenta ▼</button>
+
+        <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
+          {[...menuItems, ...extraItems].map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <button
+                key={item.name}
+                onClick={() => router.push(item.path)}
+                className={`w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold text-sm transition-all border-2 cursor-pointer ${
+                  isActive ? 'bg-[#DFF0DF] text-[#1A2E1A] border-[#1A2E1A]' : 'text-gray-400 border-transparent hover:bg-black/5'
+                }`}
+              >
+                <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                {item.name}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="pt-6 border-t border-black/5 space-y-2">
+          <button 
+            onClick={() => router.push('/settings')}
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-sm transition-all border-2 cursor-pointer ${
+              pathname === '/settings' 
+                ? 'bg-[#DFF0DF] text-[#1A2E1A] border-[#1A2E1A]' 
+                : 'text-gray-400 border-transparent bg-transparent hover:bg-black/5'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <Settings size={20} />
+              <span>Settings</span>
+            </div>
+            {pathname !== '/settings' && <ChevronRight size={16} className="text-gray-300" />}
+          </button>
+
+          {/* BOTÓN LOGOUT DESKTOP */}
+          <button 
+            type="button"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl font-bold text-sm text-red-500 border-2 border-transparent hover:bg-red-50 transition-all cursor-pointer disabled:opacity-50"
+          >
+            <LogOut size={20} />
+            <span>{isLoggingOut ? 'Saliendo...' : 'Cerrar Sesión'}</span>
+          </button>
+
+          <div className="bg-white/60 p-4 rounded-3xl border border-black/5 flex items-center gap-3 shadow-sm mt-2">
+            <div className="w-10 h-10 rounded-full bg-[#2ECC71] border-2 border-white flex items-center justify-center text-white font-black">G</div>
+            <span className="text-sm font-black truncate">@{profile.username}</span>
+          </div>
         </div>
       </aside>
 
-      {/* Área de Contenido Principal */}
-      <main className="flex-1 p-12 overflow-y-auto">
-        <header className="flex justify-between items-start mb-16">
-          <h2 className="text-5xl font-black leading-snug tracking-tight">
-            Hey <span className="text-[#2ECC71]">@{username}</span>, completa <br /> estos pasos para ganar 🎯
-          </h2>
-          <div className="text-right">
-            <p className="font-black text-3xl text-[#2ECC71] mb-1">{currentStep - 1}/{checklistSteps.length}</p>
-            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">tareas completadas</p>
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        <header className="h-16 md:h-20 flex items-center justify-between px-6 md:px-10 border-b border-gray-50 bg-white z-10">
+          <h2 className="text-lg md:text-xl font-black text-gray-400">Dashboard</h2>
+          <div className="flex items-center gap-3 bg-[#F9FBF9] px-4 py-2 rounded-full border border-[#DFF0DF]/60 shadow-sm">
+            <span className="text-xs md:text-sm font-bold text-[#2ECC71] font-mono">globos.me/{profile.username}</span>
+            <Copy 
+              size={16} 
+              className="text-[#2ECC71] cursor-pointer hover:opacity-70" 
+              onClick={() => navigator.clipboard.writeText(`globos.me/${profile.username}`)}
+            />
           </div>
         </header>
 
-        {/* Sección de Checklist Corregida */}
-        <div className="bg-white p-10 rounded-[2.8rem] border shadow-sm space-y-4" style={{ borderColor: colors.borderGray, boxShadow: `0 15px 40px -10px ${colors.emeraldShadow}` }}>
-          {checklistSteps.map(step => {
-            const isExpanded = step.id === currentStep;
-            const isCompleted = step.id < currentStep;
+        <div className="flex-1 overflow-y-auto bg-white p-6 md:p-16 pb-32">
+          <div className="max-w-2xl mx-auto md:mx-0">
+            <div className="mb-10">
+              <h1 className="text-3xl md:text-6xl font-black mb-1 tracking-tight text-[#1A2E1A]">Bienvenido, {profile.username} 👋</h1>
+              <p className="text-gray-400 text-lg md:text-2xl font-bold">Let's get you ready to sell.</p>
+            </div>
 
-            return (
-              <div key={step.id} className={`relative flex items-start p-6 rounded-2xl transition-all duration-300 ${isExpanded ? 'bg-[#F9FBF9] border-gray-100 border' : 'bg-white'}`}>
-                
-                {/* Indicador de paso */}
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 border-2 transition-colors ${isCompleted ? 'bg-[#2ECC71] border-[#2ECC71]' : (isExpanded ? 'border-[#2ECC71]' : 'border-gray-100')}`}>
-                  {isCompleted ? <Check size={18} className="text-[#1A2E1A]" /> : <span className={`text-sm font-black ${isExpanded ? 'text-[#2ECC71]' : 'text-gray-300'}`}>{step.id}</span>}
+            <div className="grid grid-cols-1 gap-4">
+              {dashboardActions.map((action, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => router.push(action.path)}
+                  className="group bg-white border border-gray-100/50 p-6 rounded-[2.5rem] flex items-center justify-between shadow-[0_4px_15px_rgba(0,0,0,0.02)] hover:border-[#2ECC71]/30 transition-all cursor-pointer active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className={`w-16 h-16 ${action.bg} rounded-[1.5rem] flex items-center justify-center transition-transform group-hover:rotate-3`}>
+                      <action.icon className={action.col} size={28} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black group-hover:text-[#2ECC71] transition-colors">
+                        {action.title} <ChevronRight size={18} className="inline ml-1" />
+                      </h3>
+                      <p className="text-gray-400 font-bold text-sm leading-tight">{action.desc}</p>
+                    </div>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-                {/* Contenido del paso */}
-                <div className="flex-1 px-6">
-                  {isExpanded ? (
-                    <div className="flex items-center justify-between gap-8">
-                      <div className="max-w-md">
-                        <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                        <p className="text-sm font-medium text-gray-500 leading-relaxed">{step.desc}</p>
-                        {step.button && (
-                          <button 
-                            onClick={() => setCurrentStep(prev => prev + 1)}
-                            className="mt-6 px-8 py-3 rounded-xl font-bold text-sm bg-[#2ECC71] hover:shadow-lg transition-all"
-                            style={{ color: colors.forest }}
-                          >
-                            {step.button}
-                          </button>
-                        )}
-                      </div>
-                      {step.iconUrl && (
-                        <div className="hidden md:block w-32 h-32 rounded-3xl bg-white border border-gray-100 p-2 shadow-sm">
-                          <img src={step.iconUrl} alt="Preview" className="w-full h-full object-cover rounded-2xl" />
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-between py-1">
-                      <p className={`font-bold text-gray-800 ${isCompleted ? 'opacity-40' : ''}`}>{step.title}</p>
-                      <ChevronRight size={18} className="text-gray-300" />
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        {/* Móvil Navbar */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-[#DFF0DF]/60 flex items-center justify-around z-50">
+          {menuItems.map((item) => (
+            <button key={item.name} onClick={() => router.push(item.path)} className="flex flex-col items-center gap-1 flex-1">
+              <item.icon size={22} className={pathname === item.path ? 'text-[#2ECC71]' : 'text-gray-300'} />
+              <span className={`text-[9px] font-black uppercase tracking-tighter ${pathname === item.path ? 'text-[#2ECC71]' : 'text-gray-300'}`}>{item.name}</span>
+            </button>
+          ))}
+          <button onClick={() => setIsDrawerOpen(true)} className="flex flex-col items-center gap-1 flex-1">
+            <div className="w-5 h-5 border-2 border-gray-300 rounded-[4px] flex items-center justify-center">
+              <span className="text-[10px] font-black text-gray-300">+</span>
+            </div>
+            <span className="text-[9px] font-black uppercase text-gray-300 tracking-tighter">Más</span>
+          </button>
+        </nav>
+
+        {/* Móvil Drawer */}
+        <div className={`fixed inset-0 z-[100] transition-all duration-300 md:hidden ${isDrawerOpen ? 'visible' : 'invisible'}`}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={() => setIsDrawerOpen(false)} />
+          <div className={`absolute right-0 top-0 bottom-0 w-[82%] bg-white transition-transform duration-500 ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
+            <header className="p-6 flex items-center justify-between border-b border-gray-50">
+               <span className="text-2xl">🎈 globos</span>
+               <button onClick={() => setIsDrawerOpen(false)}><X size={20} /></button>
+            </header>
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+               <div className="grid grid-cols-3 gap-4">
+                  {extraItems.map((opt) => (
+                    <button key={opt.name} onClick={() => { router.push(opt.path); setIsDrawerOpen(false); }} className="flex flex-col items-center gap-2">
+                      <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center"><opt.icon size={22} /></div>
+                      <span className="text-[10px] font-bold text-center uppercase tracking-tighter text-gray-500">{opt.name}</span>
+                    </button>
+                  ))}
+               </div>
+               
+               <div className="pt-4 border-t space-y-2">
+                 <button onClick={() => { router.push('/settings'); setIsDrawerOpen(false); }} className="w-full flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
+                   <Settings size={18} /> <span className="text-sm font-bold">Settings</span>
+                 </button>
+                 <button onClick={handleLogout} className="w-full flex items-center gap-3 p-4 bg-red-50 text-red-500 rounded-2xl">
+                   <LogOut size={18} /> <span className="text-sm font-bold">Cerrar Sesión</span>
+                 </button>
+               </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>
